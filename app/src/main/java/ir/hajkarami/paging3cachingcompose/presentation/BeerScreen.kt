@@ -7,15 +7,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.items
 import ir.hajkarami.paging3cachingcompose.domain.Beer
 
 @Composable
@@ -23,18 +21,16 @@ fun BeerScreen(
     beers: LazyPagingItems<Beer>
 ) {
     val context = LocalContext.current
-    LaunchedEffect(key1 = beers.loadState) {
-        if(beers.loadState.refresh is LoadState.Error) {
-            Toast.makeText(
-                context,
-                "Error: " + (beers.loadState.refresh as LoadState.Error).error.message,
-                Toast.LENGTH_LONG
-            ).show()
+    val errorMessage = (beers.loadState.refresh as? LoadState.Error)?.error?.message
+
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            Toast.makeText(context, "Error: $it", Toast.LENGTH_LONG).show()
         }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        if(beers.loadState.refresh is LoadState.Loading) {
+        if (beers.loadState.refresh is LoadState.Loading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center)
             )
@@ -44,8 +40,9 @@ fun BeerScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                items(beers) { beer ->
-                    if(beer != null) {
+                items(beers.itemCount) { index ->
+                    val beer = beers[index]
+                    if (beer != null) {
                         BeerItem(
                             beer = beer,
                             modifier = Modifier.fillMaxWidth()
@@ -53,7 +50,7 @@ fun BeerScreen(
                     }
                 }
                 item {
-                    if(beers.loadState.append is LoadState.Loading) {
+                    if (beers.loadState.append is LoadState.Loading && beers.itemCount > 0) {
                         CircularProgressIndicator()
                     }
                 }
