@@ -23,7 +23,7 @@ Paging3Caching is a sample Android application that demonstrates the use of **Pa
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/Paging3Caching.git
+   git clone https://github.com/mshajkarami/Paging3Caching.git
    ```
 2. Open the project in Android Studio.
 3. Sync Gradle dependencies.
